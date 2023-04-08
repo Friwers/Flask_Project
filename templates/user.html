@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="">
+        <h1>{{ user.name }} {{ user.surname }}</h1>
+        <p>
+            Почта
+            <br>
+            {{ user.email }}
+        </p>
+        <p>
+            Возраст
+            <br>
+            {{ user.age }}
+        </p>
+        <p>
+            Адрес
+            <br>
+            {{ user.address }}
+        </p>
+        {% if current_user.id == user.id or current_user.is_admin %}
+            <a class="btn btn-primary" href="/user/ed/{{ user.id }}" role="button">Редактировать</a>
+            <a class="btn btn-danger" href="/logout" role="button">Выйти</a>
+        {% endif %}
+    </form>
+{% endblock %}
