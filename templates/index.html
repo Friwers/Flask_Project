@@ -3,22 +3,27 @@
 {% block content %}
     {% for item in products %}
         <div class="col-md6 border rounded">
-            <h2>{{ item.title }}</h2>
+            <h2>{{ item[0].title }}</h2>
             <div>
-                {{ item.price }} руб
+                {{ item[0].price }} руб
             </div>
             <div>
-                {{ item.about }}
+                {{ item[0].about }}
             </div>
+
+            <div>
+                {{ item[1] }}
+            </div>
+
             <div>
                 Производитель - <a
-                    href="/user/{{ item.manufacturer_id }}">{{ item.manufacturer.name }} {{ item.manufacturer.surname }}</a>
+                    href="/user/{{ item[0].manufacturer_id }}">{{ item[0].manufacturer.name }} {{ item[0].manufacturer.surname }}</a>
 
-                {% if current_user.is_authenticated and current_user == item.manufacturer or current_user.is_admin %}
-                    <div align="right"><a href="/product/ed/{{ item.id }}" class="btn btn-warning">
+                {% if current_user.is_authenticated and current_user == item[0].manufacturer or current_user.is_admin %}
+                    <div align="right"><a href="/product/ed/{{ item[0].id }}" class="btn btn-warning">
                         Изменить
                     </a>
-                        <a href="/product_delete/{{ item.id }}" class="btn btn-danger">
+                        <a href="/product_delete/{{ item[0].id }}" class="btn btn-danger">
                             Удалить
                         </a></div>
                 {% endif %}

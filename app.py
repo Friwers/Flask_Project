@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_restful import Api
 
 from data import db_session
+from data.category import Category
 from data.products import Product
 from data.users import User
 from forms.login_forms import LoginForm
@@ -21,7 +22,13 @@ login_manager.init_app(app)
 def index():
     db_sess = db_session.create_session()
     products = db_sess.query(Product)
-    return render_template('index.html', title='Товары', products=products)
+    lst = []
+    for i in products:
+        s = []
+        for j in i.categories:
+            s.append(j.name)
+        lst.append((i, ' '.join(s)))
+    return render_template('index.html', title='Товары', products=lst)
 
 
 @login_manager.user_loader
@@ -131,14 +138,15 @@ def user(user_id):
 def addproduct():
     form = ProductForm()
     db_sess = db_session.create_session()
+    categories = db_sess.query(Category).all()
+    form.category.choices = [(i.id, i.name) for i in categories]
     if form.validate_on_submit():
         product = Product()
         product.title = form.title.data
         product.price = form.price.data
         product.about = form.about.data
-
-        # current_user.news.append(news)
-        # db_sess.merge(current_user)
+        product.categories.extend(
+            db_sess.query(Category).filter(Category.id.in_(form.category.data)).all())
 
         product.manufacturer = current_user
         db_sess.merge(product)
@@ -164,6 +172,9 @@ def product_delete(product_id):
     else:
         abort(404)
     return redirect('/')
+
+
+
 
 
 if __name__ == '__main__':

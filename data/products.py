@@ -21,4 +21,8 @@ class Product(SqlAlchemyBase, UserMixin, SerializerMixin):
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                       default=datetime.datetime.now)  # дата изменения
 
+    categories = orm.relationship("Category",
+                                  secondary="association",
+                                  backref="products") # категория товара
+
     manufacturer = orm.relationship('User')
