@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <a class="btn btn-danger" href="/clean" type="button">Очистить корзину</a>
+    <p></p>
+    {% for i in products %}
+        {%if i.customer == current_user.email%}
+        <div class="col-md6 border rounded">
+            <div>
+                {%if i.image%}
+                    <img height="150" src="data:image/jpeg;base64,{{ i.image }}"/>
+                {% endif %}
+                <div>
+                    <p class="card-text">{{i.title}} Цена: {{i.price}} рублей</p>
+                </div>
+                    <a class="btn btn-danger" href="/del_product/{{ i.id }}" type="button">Удалить товар</a>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+    {% endfor %}
+
+{% endblock %}

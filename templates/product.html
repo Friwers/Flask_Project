@@ -43,7 +43,8 @@
             </p>
         {% endfor %}
     </p>
-
+    <label for="photo">Выберите файл</label>
+    <input type="file" class="form-control-file" id="photo" name="img">
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
     {{message}}
 </form>

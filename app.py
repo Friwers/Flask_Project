@@ -3,12 +3,14 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_restful import Api
 
 from data import db_session
+from data.cart import Cart
 from data.category import Category
 from data.products import Product
 from data.users import User
 from forms.login_forms import LoginForm
 from forms.product import ProductForm
 from forms.user import RegisterForm, UserEditForm
+from image import byte_img_to_html
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -148,6 +150,10 @@ def addproduct():
         product.categories.extend(
             db_sess.query(Category).filter(Category.id.in_(form.category.data)).all())
 
+
+        if request.files['img']:
+            product.image = byte_img_to_html(request.files['img'])
+
         product.manufacturer = current_user
         db_sess.merge(product)
 
@@ -173,8 +179,75 @@ def product_delete(product_id):
         abort(404)
     return redirect('/')
 
+@app.route('/sort_increase')
+def sort_increase():
+    db_sess = db_session.create_session()
+    products = db_sess.query(Product).order_by(Product.price)
+    lst = []
+    for i in products:
+        s = []
+        for j in i.categories:
+            s.append(j.name)
+        lst.append((i, ' '.join(s)))
+    return render_template('index.html', title='Товары', products=lst)
+
+@app.route('/sort_descending')
+def sort_descending():
+    db_sess = db_session.create_session()
+    products = db_sess.query(Product).order_by(Product.price)
+    lst = []
+    for i in products:
+        s = []
+        for j in i.categories:
+            s.append(j.name)
+        lst.append((i, ' '.join(s)))
+    return render_template('index.html', title='Товары', products=reversed(lst))
 
 
+@app.route('/cart_fill/<int:product_id>', methods=['GET', 'POST'])
+@login_required
+def cart_fill(product_id):
+    db_sess = db_session.create_session()
+    product = db_sess.query(Product).get(product_id)
+    user_cart = Cart()
+    user_cart.title = product.title
+    user_cart.image = product.image
+    user_cart.price = product.price
+    user_cart.about = product.about
+    user_cart.manufacturer_id = product.manufacturer_id
+    user_cart.customer = current_user.email
+    db_sess.merge(user_cart)
+    db_sess.commit()
+    return redirect('/')
+
+@app.route('/clean', methods=['GET', 'POST'])
+@login_required
+def clean():
+    db_sess = db_session.create_session()
+    products = db_sess.query(Cart).all()
+    for i in products:
+        db_sess.delete(i)
+    db_sess.commit()
+    return redirect('/cart')
+
+@app.route('/del_product/<int:product_id>', methods=['GET', 'POST'])
+@login_required
+def del_product(product_id):
+    db_sess = db_session.create_session()
+    product = db_sess.query(Cart).get(product_id)
+    db_sess.delete(product)
+    db_sess.commit()
+    return redirect('/cart')
+
+@app.route('/cart', methods=['GET', 'POST'])
+@login_required
+def cart():
+    db_sess = db_session.create_session()
+    products = db_sess.query(Cart)
+    lst = []
+    for i in products:
+        lst.append(i)
+    return render_template('cart.html', title='Корзина', products=lst)
 
 
 if __name__ == '__main__':

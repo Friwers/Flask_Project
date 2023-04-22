@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <a class="btn btn-success" href="/cart" role="button">Корзина</a>
+    <div>
+        <br>
+        <a class="btn btn-outline-danger" href="/sort_increase" role="button">Сортировка по возрастанию</a>
+        <a class="btn btn-outline-danger" href="/sort_descending" role="button">Сортировка по убыванию</a>
+        </br>
+    </div>
     {% for item in products %}
         <div class="col-md6 border rounded">
             <h2>{{ item[0].title }}</h2>
@@ -14,11 +21,11 @@
             <div>
                 {{ item[1] }}
             </div>
-
+            <img height="200" src="data:image/jpeg;base64,{{ item[0].image }}"/>
             <div>
-                Производитель - <a
-                    href="/user/{{ item[0].manufacturer_id }}">{{ item[0].manufacturer.name }} {{ item[0].manufacturer.surname }}</a>
-
+                <br>
+                    <a class="btn btn-success"  href="/cart_fill/{{ item[0].id }}" role="button">купить</a>
+                </br>
                 {% if current_user.is_authenticated and current_user == item[0].manufacturer or current_user.is_admin %}
                     <div align="right"><a href="/product/ed/{{ item[0].id }}" class="btn btn-warning">
                         Изменить
