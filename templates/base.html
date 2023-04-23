@@ -1,5 +1,8 @@
 <!doctype html>
 <html lang="en">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.16.15/dist/css/uikit.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.16.15/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.16.15/dist/js/uikit-icons.min.js"></script>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -15,6 +18,17 @@
         <a class="navbar-brand" href="/">Онлайн Магазин</a>
         {% if current_user.is_authenticated %}
             <a class="navbar-brand" href="/user/{{ current_user.id }}">{{ current_user.name }}</a>
+        <div uk-dropdown="mode: click">
+                    <ul class="uk-nav uk-dropdown-nav">
+                        <li><a class="navbar-brand" href="/user/{{ current_user.id }}">Моя страница</a></li>
+                        {% if current_user.is_admin %}
+                            <li><a class="navbar-brand" href="/addproduct">Опубликовать товар</a></li>
+                        {% endif %}
+                        <li><a class="navbar-brand" href="/cart">Корзина</a></li>
+                        <li><a class="navbar-brand" href="/search">Поиск</a></li>
+                        <li><a class="navbar-brand" href="/logout" style="color:red">Выйти</a></li>
+                    </ul>
+        </div>
         {% else %}
             <p>
                 <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
