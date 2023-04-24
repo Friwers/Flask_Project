@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <a class="btn btn-success" href="/cart" role="button">Корзина</a>
-    <div>
-        <br>
-        <a class="btn btn-outline-danger" href="/sort_increase" role="button">Сортировка по возрастанию</a>
-        <a class="btn btn-outline-danger" href="/sort_descending" role="button">Сортировка по убыванию</a>
+    <br>
+    <a class="p-3 mb-2 bg-info text-white" role="button">Сортировка</a>
+    <div uk-dropdown="mode: click">
+                    <br>
+                    <ul class="uk-nav uk-dropdown-nav">
+                        <li><a class="navbar-brand" href="/sort_increase">Возрастание</a></li>
+                        <li><a class="navbar-brand" href="/sort_descending">Убывание</a></li>
+                    </ul>
     </div>
+    <p></p>
     {% for item in products %}
         <div class="col-md6 border rounded">
             <h2>{{ item[0].title }}</h2>
@@ -38,8 +42,4 @@
         <br>
 
     {% endfor %}
-    <br>
-    {% if current_user.is_admin %}
-        <a href="/addproduct" class="btn btn-secondary">Добавить продукт</a>
-    {% endif %}
 {% endblock %}
