@@ -18,11 +18,13 @@ class Product(SqlAlchemyBase, UserMixin, SerializerMixin):
     price = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)  # цена товара
     about = sqlalchemy.Column(sqlalchemy.String, nullable=False)  # описание товара
     image = sqlalchemy.Column(sqlalchemy.String)  # изображение товара (если есть)
+    count = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)  # кол-во товаров
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                      default=datetime.datetime.now)  # дата изменения
+                                      default=datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"), "%d/%m/%Y %H:%M:%S"))  # дата изменения
 
     categories = orm.relationship("Category",
                                   secondary="association",
                                   backref="products") # категория товара
+    cart = orm.relationship("Cart", back_populates='product')
 
     manufacturer = orm.relationship('User')

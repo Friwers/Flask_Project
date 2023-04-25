@@ -8,34 +8,50 @@
                     <ul class="uk-nav uk-dropdown-nav">
                         <li><a class="navbar-brand" href="/sort_increase">Возрастание</a></li>
                         <li><a class="navbar-brand" href="/sort_descending">Убывание</a></li>
+                        <li><a class="navbar-brand" href="/sort_recent">Новые</a></li>
+                        <li><a class="navbar-brand" href="/sort_old">Старые</a></li>
                     </ul>
     </div>
     <p></p>
+    {% for tag in tags %}
+        <a href="/search/{{ tag[1:] }}">{{ tag }}</a>
+    {% endfor %}
     {% for item in products %}
         <div class="col-md6 border rounded">
             <h2>{{ item[0].title }}</h2>
             <div>
                 {{ item[0].price }} руб
             </div>
+
             <div>
                 {{ item[0].about }}
             </div>
 
             <div>
+                {{ item[0].count }} штук
+            </div>
+
+            <div>
                 {{ item[1] }}
             </div>
+
+            <div>
+                {{ item[0].modified_date }}
+            </div>
+
             <img height="200" src="data:image/jpeg;base64,{{ item[0].image }}"/>
             <div align="left">
                 <a class="btn btn-success"  href="/cart_fill/{{ item[0].id }}" role="button">купить</a>
             </div>
             <div>
                 {% if current_user.is_authenticated and current_user == item[0].manufacturer or current_user.is_admin %}
-                    <div align="right"><a href="/product/ed/{{ item[0].id }}" class="btn btn-warning">
+                    <div align="right"><a href="/editproduct//{{ item[0].id }}" class="btn btn-warning">
                         Изменить
                     </a>
                         <a href="/product_delete/{{ item[0].id }}" class="btn btn-danger">
                             Удалить
-                        </a></div>
+                        </a>
+                    </div>
                 {% endif %}
             </div>
         </div>
