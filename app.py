@@ -1,8 +1,9 @@
 from flask import Flask, url_for, request, render_template, redirect, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_restful import Api
+from sqlalchemy import and_
 
-from data import db_session
+from data import db_session, product_resources
 from data.cart import Cart
 from data.category import Category
 from data.products import Product
@@ -19,6 +20,7 @@ api = Api(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 
 
 @app.route('/')
@@ -298,7 +300,7 @@ def clean():
 @login_required
 def del_product(product_id):
     db_sess = db_session.create_session()
-    product = db_sess.query(Cart).filter(Cart.product_id == product_id, Cart.customer == current_user.email).first()
+    product = db_sess.query(Cart).filter(Cart.id == product_id, Cart.customer == current_user.email).first()
     db_sess.delete(product)
     db_sess.commit()
     return redirect('/cart')
@@ -318,10 +320,20 @@ def buy():
     db_sess = db_session.create_session()
     cart = db_sess.query(Cart).filter(Cart.customer == current_user.email).all()
     for i in cart:
-        product = db_sess.query(Product).get(i.product_id)
-        product.count -= 1
+        i.product.count -= 1
     db_sess.commit()
     return redirect('/clean')
+
+@app.route('/buy_one/<int:product_id>', methods=['GET', 'POST'])
+@login_required
+def buy_one(product_id):
+    db_sess = db_session.create_session()
+    cart = db_sess.query(Cart).filter(Cart.id == product_id, Cart.customer == current_user.email).first()
+    cart.product.count -= 1
+    db_sess.delete(cart)
+    db_sess.commit()
+    return redirect('/cart')
+
 
 @app.route('/category', methods=['GET', 'POST'])
 @login_required
@@ -339,37 +351,6 @@ def category():
     return render_template('category.html', title='Добавление категории',
                            form=form)
 
-
-# @app.route('/search', methods=['GET', 'POST'])
-# @login_required
-# def searchpass():
-#     form = SearchForm()
-#     if form.validate_on_submit():
-#         return redirect(f'/search/{form.requests.data}')
-#     return render_template('search.html', title='Поиск', form=form)
-#
-#
-# @app.route('/search/<string:req>', methods=['GET', 'POST'])
-# @login_required
-# def search(req):
-#     form = SearchForm()
-#     db_sess = db_session.create_session()
-#     users = db_sess.query(User).filter(
-#         User.name.ilike(f'%{req}%') | User.surname.ilike(f'%{req}%')).all()
-#     products = db_sess.query(Product).filter(
-#         Product.tags.ilike(f'%{req}%') | Product.title.ilike(f'%{req}%') | Product.content.ilike(
-#             f'%{req}%')).all()
-#     lst = []
-#     for post in products:
-#         tags = []
-#         if post.tags:
-#             for tag in post.tags.split():
-#                 tags.append(tag)
-#         lst.append((post, tags))
-#     if request.method == "GET":
-#         form.requests.data = req
-#     if form.validate_on_submit():
-#         return redirect(f'/search/{form.requests.data}')
 
 if __name__ == '__main__':
     db_session.global_init("db/store.db")
