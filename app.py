@@ -140,7 +140,7 @@ def user(user_id):
 
 @app.route('/addproduct', methods=['GET', 'POST'])
 @login_required
-def addproduct():
+def add_product():
     form = ProductForm()
     db_sess = db_session.create_session()
     categories = db_sess.query(Category).all()
