@@ -1,16 +1,14 @@
-from flask import Flask, url_for, request, render_template, redirect, abort
+from flask import Flask, request, render_template, redirect, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_restful import Api
-from sqlalchemy import and_
 
-from data import db_session, product_resources
+from data import db_session
 from data.cart import Cart
 from data.category import Category
 from data.products import Product
 from data.users import User
 from forms.login_forms import LoginForm
 from forms.product import ProductForm
-from forms.search import SearchForm
 from forms.user import RegisterForm, UserEditForm
 from image import byte_img_to_html
 
@@ -20,7 +18,6 @@ api = Api(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
 
 
 @app.route('/')
@@ -174,7 +171,8 @@ def edit_product(id):
     categories = db_sess.query(Category).all()
     form.category.choices = [(i.id, i.name) for i in categories]
     if request.method == "GET":
-        product = db_sess.query(Product).filter(Product.id == id, Product.manufacturer == current_user).first()
+        product = db_sess.query(Product).filter(Product.id == id,
+                                                Product.manufacturer == current_user).first()
         if product:
             form.title.data = product.title
             form.price.data = product.price
@@ -184,7 +182,8 @@ def edit_product(id):
         else:
             abort(404)
     if form.validate_on_submit():
-        product = db_sess.query(Product).filter(Product.id == id, Product.manufacturer == current_user).first()
+        product = db_sess.query(Product).filter(Product.id == id,
+                                                Product.manufacturer == current_user).first()
         if product:
             form.title.data = product.title
             form.price.data = product.price
@@ -300,7 +299,8 @@ def clean():
 @login_required
 def del_product(product_id):
     db_sess = db_session.create_session()
-    product = db_sess.query(Cart).filter(Cart.id == product_id, Cart.customer == current_user.email).first()
+    product = db_sess.query(Cart).filter(Cart.id == product_id,
+                                         Cart.customer == current_user.email).first()
     db_sess.delete(product)
     db_sess.commit()
     return redirect('/cart')
@@ -324,11 +324,13 @@ def buy():
     db_sess.commit()
     return redirect('/clean')
 
+
 @app.route('/buy_one/<int:product_id>', methods=['GET', 'POST'])
 @login_required
 def buy_one(product_id):
     db_sess = db_session.create_session()
-    cart = db_sess.query(Cart).filter(Cart.id == product_id, Cart.customer == current_user.email).first()
+    cart = db_sess.query(Cart).filter(Cart.id == product_id,
+                                      Cart.customer == current_user.email).first()
     cart.product.count -= 1
     db_sess.delete(cart)
     db_sess.commit()
